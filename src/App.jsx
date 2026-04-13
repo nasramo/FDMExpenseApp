@@ -1,5 +1,5 @@
 import { useState } from "react";
-import TrackpointLight from "./assets/icons/TrackpointLight.svg";
+import TrackpointLight from "./assets/TrackpointLight.svg";
 
 export default function App() {
   const [message, setMessage] = useState("");

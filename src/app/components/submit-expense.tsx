@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Upload, X, Camera, Loader, CheckCircle } from 'lucide-react';
+import { supabase } from '../../supabaseClient';
 
 export function SubmitExpense() {
   const [formData, setFormData] = useState({
@@ -13,6 +14,8 @@ export function SubmitExpense() {
   const [receiptPreview, setReceiptPreview] = useState<string>('');
   const [ocrProcessing, setOcrProcessing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const categories = [
     'Travel',
@@ -56,22 +59,74 @@ export function SubmitExpense() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      // Reset form
-      setFormData({
-        amount: '',
-        category: '',
-        date: '',
-        project: '',
-        notes: '',
-      });
-      setReceipt(null);
-      setReceiptPreview('');
-    }, 2000);
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      let receiptUrl = null;
+
+      // Upload receipt file to Supabase storage if it exists
+      if (receipt) {
+        const fileName = `receipts/${Date.now()}_${receipt.name}`;
+        const { data, error: uploadError } = await supabase.storage
+          .from('expenses')
+          .upload(fileName, receipt);
+
+        if (uploadError) {
+          throw new Error(`File upload failed: ${uploadError.message}`);
+        }
+
+        // Get the public URL
+        const { data: publicUrlData } = supabase.storage
+          .from('expenses')
+          .getPublicUrl(fileName);
+        receiptUrl = publicUrlData.publicUrl;
+      }
+
+      // Save expense to database
+      const { data, error: insertError } = await supabase
+        .from('expenses')
+        .insert([
+          {
+            amount: parseFloat(formData.amount),
+            category: formData.category,
+            date: formData.date,
+            project: formData.project,
+            notes: formData.notes,
+            receipt_url: receiptUrl,
+            status: 'pending',
+          },
+        ])
+        .select();
+
+      if (insertError) {
+        throw new Error(`Failed to save expense: ${insertError.message}`);
+      }
+
+      // Show success message
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        // Reset form
+        setFormData({
+          amount: '',
+          category: '',
+          date: '',
+          project: '',
+          notes: '',
+        });
+        setReceipt(null);
+        setReceiptPreview('');
+      }, 2000);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
+      console.error('Expense submission error:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRemoveReceipt = () => {
@@ -106,6 +161,12 @@ export function SubmitExpense() {
         <h1 className="text-4xl font-bold text-foreground mb-2">Submit Expense</h1>
         <p className="text-muted-foreground">Upload your receipt and fill in the details</p>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-xl">
+          <p className="text-destructive text-sm font-medium">{error}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Receipt Upload */}
@@ -267,15 +328,24 @@ export function SubmitExpense() {
         <div className="flex items-center justify-end gap-4">
           <button
             type="button"
-            className="px-6 py-3 border border-border rounded-xl font-medium hover:bg-secondary transition-colors"
+            disabled={isLoading}
+            className="px-6 py-3 border border-border rounded-xl font-medium hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Save as Draft
           </button>
           <button
             type="submit"
-            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-opacity shadow-lg shadow-primary/20"
+            disabled={isLoading}
+            className="px-6 py-3 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-opacity shadow-lg shadow-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            Submit for Approval
+            {isLoading ? (
+              <>
+                <Loader size={18} className="animate-spin" />
+                Submitting...
+              </>
+            ) : (
+              'Submit for Approval'
+            )}
           </button>
         </div>
       </form>

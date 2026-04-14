@@ -45,53 +45,53 @@ export function Dashboard({ userRole = 'employee' }: DashboardProps) {
   const recentActivity = [
     {
       id: 1,
-      type: 'approved',
+      type: 'Approved',
       title: 'Client Lunch - Acme Corp',
       amount: '$124.50',
       date: '2 hours ago',
-      status: 'approved'
+      status: 'Approved'
     },
     {
       id: 2,
-      type: 'pending',
+      type: 'Pending',
       title: 'Travel - London Office',
       amount: '$850.00',
       date: '5 hours ago',
-      status: 'pending'
+      status: 'Pending'
     },
     {
       id: 3,
-      type: 'approved',
+      type: 'Approved',
       title: 'Office Supplies',
       amount: '$42.99',
       date: '1 day ago',
-      status: 'approved'
+      status: 'Approved'
     },
     {
       id: 4,
-      type: 'rejected',
+      type: 'Rejected',
       title: 'Team Dinner',
       amount: '$280.00',
       date: '2 days ago',
-      status: 'rejected'
+      status: 'Rejected'
     },
     {
       id: 5,
-      type: 'approved',
+      type: 'Approved',
       title: 'Software Subscription',
       amount: '$99.00',
       date: '3 days ago',
-      status: 'approved'
+      status: 'Approved'
     },
   ];
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved':
+      case 'Approved':
         return 'bg-success/10 text-success border-success/20';
-      case 'pending':
+      case 'Pending':
         return 'bg-warning/10 text-warning border-warning/20';
-      case 'rejected':
+      case 'Rejected':
         return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return 'bg-muted text-muted-foreground border-border';
@@ -180,10 +180,10 @@ export function Dashboard({ userRole = 'employee' }: DashboardProps) {
               key={activity.id}
               className="p-6 hover:bg-muted/30 transition-colors cursor-pointer group"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <h4 className="font-medium text-foreground group-hover:text-primary transition-colors">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3 mb-2">
+                    <h4 className="font-medium text-foreground group-hover:text-primary transition-colors min-w-0 break-words">
                       {activity.title}
                     </h4>
                     <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(activity.status)}`}>

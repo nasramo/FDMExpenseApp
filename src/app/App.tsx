@@ -34,7 +34,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard userRole={userRole} />} />
           <Route path="/submit" element={<SubmitExpense />} />
           <Route path="/requests" element={<Requests />} />
-          {(userRole === 'manager' || userRole === 'admin') && (
+          {userRole === 'manager' && (
             <Route path="/approvals" element={<Approvals />} />
           )}
           <Route path="/settings" element={<Settings />} />

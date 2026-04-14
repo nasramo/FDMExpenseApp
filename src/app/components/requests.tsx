@@ -15,7 +15,7 @@ export function Requests() {
       project: 'Client: Acme Corp',
       date: '2026-04-12',
       submittedDate: '2026-04-12',
-      status: 'approved',
+      status: 'Approved',
       receipt: 'https://images.unsplash.com/photo-1554224311-beee4f7e4fc7?w=400',
       notes: 'Business lunch with client to discuss Q2 strategy',
       timeline: [
@@ -31,7 +31,7 @@ export function Requests() {
       project: 'Internal',
       date: '2026-04-10',
       submittedDate: '2026-04-13',
-      status: 'pending',
+      status: 'Pending',
       receipt: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=400',
       notes: 'Flight tickets for London office visit',
       timeline: [
@@ -46,7 +46,7 @@ export function Requests() {
       project: 'Internal',
       date: '2026-04-11',
       submittedDate: '2026-04-11',
-      status: 'approved',
+      status: 'Approved',
       receipt: 'https://images.unsplash.com/photo-1612815154858-60aa4c59eaa6?w=400',
       notes: 'Notebooks and pens for team',
       timeline: [
@@ -62,7 +62,7 @@ export function Requests() {
       project: 'Internal',
       date: '2026-04-08',
       submittedDate: '2026-04-09',
-      status: 'rejected',
+      status: 'Rejected',
       receipt: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400',
       notes: 'Team celebration dinner',
       timeline: [
@@ -79,7 +79,7 @@ export function Requests() {
       project: 'Project Alpha',
       date: '2026-04-05',
       submittedDate: '2026-04-05',
-      status: 'approved',
+      status: 'Approved',
       receipt: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400',
       notes: 'Annual Figma subscription',
       timeline: [
@@ -91,11 +91,11 @@ export function Requests() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved':
+      case 'Approved':
         return 'bg-success/10 text-success border-success/20';
-      case 'pending':
+      case 'Pending':
         return 'bg-warning/10 text-warning border-warning/20';
-      case 'rejected':
+      case 'Rejected':
         return 'bg-destructive/10 text-destructive border-destructive/20';
       default:
         return 'bg-muted text-muted-foreground border-border';
@@ -141,9 +141,9 @@ export function Requests() {
                 className="pl-10 pr-8 py-3 rounded-xl border border-border bg-input-background focus:outline-none focus:ring-2 focus:ring-primary transition-all appearance-none cursor-pointer"
               >
                 <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
               </select>
             </div>
           </div>
@@ -233,7 +233,7 @@ export function Requests() {
               </div>
 
               {/* Rejection Reason */}
-              {selected.status === 'rejected' && selected.rejectionReason && (
+              {selected.status === 'Rejected' && selected.rejectionReason && (
                 <div className="p-6 border-b border-border bg-destructive/5">
                   <div className="flex items-start gap-3">
                     <MessageSquare size={18} className="text-destructive mt-0.5" />
@@ -276,7 +276,7 @@ export function Requests() {
               </div>
 
               {/* Actions */}
-              {selected.status === 'rejected' && (
+              {selected.status === 'Rejected' && (
                 <div className="p-6 bg-muted/30 border-t border-border">
                   <button className="w-full py-3 px-4 bg-primary text-primary-foreground rounded-xl font-medium hover:opacity-90 transition-opacity">
                     Appeal Decision

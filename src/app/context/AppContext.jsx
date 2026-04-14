@@ -1,32 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-type UserRole = 'employee' | 'manager' | null;
+const AppContext = createContext(undefined);
 
-interface User {
-  name: string;
-  email: string;
-  role: UserRole;
-  avatar?: string;
-}
-
-interface AppContextType {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  theme: 'light' | 'dark';
-  toggleTheme: () => void;
-  isAuthenticated: boolean;
-  login: (email: string, password: string, role: UserRole) => void;
-  logout: () => void;
-}
-
-const AppContext = createContext<AppContextType | undefined>(undefined);
-
-export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+export function AppProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [theme, setTheme] = useState('light');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.classList.toggle('dark', savedTheme === 'dark');
@@ -40,8 +21,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 
-  const login = (email: string, password: string, role: UserRole) => {
-    const user: User = {
+  const login = (email, password, role) => {
+    const user = {
       name: email.split('@')[0],
       email,
       role,

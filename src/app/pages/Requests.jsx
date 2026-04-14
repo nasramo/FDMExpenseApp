@@ -2,23 +2,7 @@ import { useState } from 'react';
 import { motion } from 'motion/react';
 import { Search, Filter, Eye, MessageSquare, FileText } from 'lucide-react';
 
-type ExpenseStatus = 'all' | 'pending' | 'approved' | 'rejected';
-
-interface Expense {
-  id: number;
-  description: string;
-  merchant: string;
-  amount: number;
-  category: string;
-  project: string;
-  date: string;
-  status: 'pending' | 'approved' | 'rejected';
-  submittedDate: string;
-  approver?: string;
-  comments?: string;
-}
-
-const mockExpenses: Expense[] = [
+const mockExpenses = [
   {
     id: 1,
     description: 'Client Dinner - Tech Solutions Inc.',

@@ -121,12 +121,9 @@ export function SubmitExpense() {
                 </p>
                 <p className="text-sm text-muted-foreground mb-4">Supports JPG, PNG, PDF up to 10MB</p>
                 <div className="flex items-center justify-center gap-4">
-                  <button
-                    type="button"
-                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity"
-                  >
+                  <span className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity inline-block">
                     Upload File
-                  </button>
+                  </span>
                   <button
                     type="button"
                     className="px-4 py-2 border border-border rounded-lg font-medium hover:bg-secondary transition-colors flex items-center gap-2"

@@ -8,6 +8,35 @@ interface DashboardProps {
 }
 
 export function Dashboard({ userRole = 'employee' }: DashboardProps) {
+  const [stats, setStats] = useState({
+  total: 0,
+  pending: 0,
+  approved: 0,
+  rejected: 0
+});
+
+useEffect(() => {
+  loadStats();
+}, []);
+
+async function loadStats() {
+  const { data, error } = await supabase
+    .from("expenses")
+    .select("amount, status");
+
+  if (error) {
+    console.error("Error loading stats:", error);
+    return;
+  }
+
+  const total = data.reduce((sum, row) => sum + row.amount, 0);
+  const pending = data.filter(r => r.status === "Pending").length;
+  const approved = data.filter(r => r.status === "Approved").length;
+  const rejected = data.filter(r => r.status === "Rejected").length;
+
+  setStats({ total, pending, approved, rejected });
+}
+
   const [recentActivity, setRecentActivity] = useState<any[]>([]);
   useEffect(() => {
   loadRecent();
@@ -48,40 +77,40 @@ function formatRelativeTime(dateString: string) {
   const diffDays = Math.floor(diffHours / 24);
   return `${diffDays} days ago`;
 }
-  const stats = [
-    {
-      label: 'Total Expenses',
-      value: '$4,829.00',
-      change: '+12.5%',
-      trend: 'up' as const,
-      icon: DollarSign,
-      color: 'primary'
-    },
-    {
-      label: 'Pending',
-      value: '3',
-      change: '-2 from last month',
-      trend: 'down' as const,
-      icon: Clock,
-      color: 'warning'
-    },
-    {
-      label: 'Approved',
-      value: '18',
-      change: '+5 from last month',
-      trend: 'up' as const,
-      icon: CheckCircle,
-      color: 'success'
-    },
-    {
-      label: 'Rejected',
-      value: '1',
-      change: 'No change',
-      trend: 'neutral' as const,
-      icon: XCircle,
-      color: 'destructive'
-    },
-  ];
+const statsArray = [
+  {
+    label: 'Total Expenses',
+    value: `£${stats.total.toFixed(2)}`,
+    change: '',
+    trend: 'neutral',
+    icon: DollarSign,
+    color: 'primary'
+  },
+  {
+    label: 'Pending',
+    value: stats.pending,
+    change: '',
+    trend: 'neutral',
+    icon: Clock,
+    color: 'warning'
+  },
+  {
+    label: 'Approved',
+    value: stats.approved,
+    change: '',
+    trend: 'neutral',
+    icon: CheckCircle,
+    color: 'success'
+  },
+  {
+    label: 'Rejected',
+    value: stats.rejected,
+    change: '',
+    trend: 'neutral',
+    icon: XCircle,
+    color: 'destructive'
+  },
+];
 
 
   const getStatusColor = (status: string) => {
@@ -137,7 +166,7 @@ function formatRelativeTime(dateString: string) {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => {
+        {statsArray.map((stat) => {
           const Icon = stat.icon;
           const trendIcon = stat.trend === 'up' ? TrendingUp : stat.trend === 'down' ? TrendingDown : null;
 

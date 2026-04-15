@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Upload, X, Camera, Loader, CheckCircle } from 'lucide-react';
 
 export function SubmitExpense() {
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const [formData, setFormData] = useState({
     amount: '',
     category: '',
@@ -114,32 +115,42 @@ export function SubmitExpense() {
 
           {!receiptPreview ? (
             <div className="border-2 border-dashed border-border rounded-xl p-12 text-center hover:border-primary transition-colors cursor-pointer group">
-              <label htmlFor="receipt-upload" className="cursor-pointer">
-                <Upload size={48} className="mx-auto text-muted-foreground group-hover:text-primary transition-colors mb-4" />
-                <p className="text-foreground font-medium mb-2">
-                  Drop your receipt here, or <span className="text-primary">browse</span>
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">Supports JPG, PNG, PDF up to 10MB</p>
-                <div className="flex items-center justify-center gap-4">
-                  <span className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity inline-block">
-                    Upload File
-                  </span>
-                  <button
-                    type="button"
-                    className="px-4 py-2 border border-border rounded-lg font-medium hover:bg-secondary transition-colors flex items-center gap-2"
-                  >
-                    <Camera size={18} />
-                    Take Photo
-                  </button>
-                </div>
-                <input
-                  id="receipt-upload"
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
+              <Upload size={48} className="mx-auto text-muted-foreground group-hover:text-primary transition-colors mb-4" />
+              <p className="text-foreground font-medium mb-2">
+                Drop your receipt here, or <span className="text-primary">browse</span>
+              </p>
+              <p className="text-sm text-muted-foreground mb-4">Supports JPG, PNG, PDF up to 10MB</p>
+              <div className="flex items-center justify-center gap-4">
+                <label
+                  htmlFor="receipt-upload"
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity inline-block cursor-pointer"
+                >
+                  Upload File
+                </label>
+                <button
+                  type="button"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="px-4 py-2 border border-border rounded-lg font-medium hover:bg-secondary transition-colors flex items-center gap-2"
+                >
+                  <Camera size={18} />
+                  Take Photo
+                </button>
+              </div>
+              <input
+                id="receipt-upload"
+                type="file"
+                accept="image/*,.pdf"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <input
+                ref={cameraInputRef}
+                type="file"
+                accept="image/*"
+                capture="environment"
+                onChange={handleFileUpload}
+                className="hidden"
+              />
             </div>
           ) : (
             <div className="relative">

@@ -131,15 +131,6 @@ export function Dashboard({ userRole = 'employee' }: DashboardProps) {
           <h3 className="text-xl font-semibold mb-1">Submit New Expense</h3>
           <p className="text-white/80 text-sm">Upload receipt and submit for approval</p>
         </Link>
-
-        <button className="group p-6 bg-card border border-border rounded-2xl hover:shadow-lg hover:scale-[1.02] transition-all text-left">
-          <div className="flex items-center justify-between mb-3">
-            <Upload size={32} className="text-primary" />
-            <span className="text-sm text-muted-foreground">Fast Upload</span>
-          </div>
-          <h3 className="text-xl font-semibold mb-1 text-foreground">Upload Receipt</h3>
-          <p className="text-muted-foreground text-sm">OCR auto-fill from receipt image</p>
-        </button>
       </div>
 
       {/* Stats Grid */}
@@ -234,5 +225,5 @@ export function Dashboard({ userRole = 'employee' }: DashboardProps) {
         </div>
       </div>
     </div>
-  );
-}
+  ); 
+} 

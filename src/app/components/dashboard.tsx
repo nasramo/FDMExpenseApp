@@ -30,9 +30,9 @@ async function loadStats() {
   }
 
   const total = data.reduce((sum, row) => sum + row.amount, 0);
-  const pending = data.filter(r => r.status === "Pending").length;
-  const approved = data.filter(r => r.status === "Approved").length;
-  const rejected = data.filter(r => r.status === "Rejected").length;
+  const pending = data.filter(r => r.status === "pending").length;
+  const approved = data.filter(r => r.status === "approved").length;
+  const rejected = data.filter(r => r.status === "rejected").length;
 
   setStats({ total, pending, approved, rejected });
 }

@@ -4,6 +4,7 @@ import { User, Bell, Shield, Globe, Palette, Save } from 'lucide-react';
 export function Settings() {
   const [activeTab, setActiveTab] = useState('profile');
   const [isDark, setIsDark] = useState(false);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState('');
   const [notifications, setNotifications] = useState({
     emailApproval: true,
     emailRejection: true,
@@ -32,6 +33,17 @@ export function Settings() {
     { id: 'appearance', label: 'Appearance', icon: Palette },
     { id: 'security', label: 'Security', icon: Shield },
   ];
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setProfilePhotoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto">
@@ -77,13 +89,24 @@ export function Settings() {
                 </div>
 
                 <div className="flex items-center gap-6 pb-6 border-b border-border">
-                  <div className="w-24 h-24 bg-gradient-to-br from-primary to-cyan-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
-                    {profile.firstName[0]}{profile.lastName[0]}
+                  <div className="w-24 h-24 bg-gradient-to-br from-primary to-cyan-600 rounded-full overflow-hidden flex items-center justify-center text-white text-3xl font-bold">
+                    {profilePhotoPreview ? (
+                      <img src={profilePhotoPreview} alt="Profile" className="w-full h-full object-cover" />
+                    ) : (
+                      <>{profile.firstName[0]}{profile.lastName[0]}</>
+                    )}
                   </div>
                   <div>
-                    <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity mb-2">
+                    <label htmlFor="profile-photo-upload" className="inline-block px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity mb-2 cursor-pointer">
                       Change Photo
-                    </button>
+                    </label>
+                    <input
+                      id="profile-photo-upload"
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                    />
                     <p className="text-xs text-muted-foreground">JPG, PNG or GIF. Max size 2MB</p>
                   </div>
                 </div>

@@ -196,7 +196,7 @@ export function Login({ onLogin }: LoginProps) {
       </div>
 
       {/* Right side - Visual */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary via-cyan-500 to-blue-600 items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-primary via-green-500 to-green-600 items-center justify-center p-12 relative overflow-hidden">
         
         <div className="absolute top-20 right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>

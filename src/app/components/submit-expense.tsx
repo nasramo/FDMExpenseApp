@@ -6,8 +6,7 @@ export function SubmitExpense() {
 
   // --- OCR Samples (Added as requested) ---
   const ocrSamples = [
-    { vendor: 'Trainline', amount: '94.50', currency: 'GBP', date: '2026-04-12', category: 'Travel' },
-    { vendor: 'Premier Inn', amount: '185.00', currency: 'GBP', date: '2026-04-10', category: 'Training & Education' },
+    { vendor: 'Trainline', amount: '4.80', currency: 'GBP', date: '2023-06-23', category: 'Travel' },
   ];
 
   const [formData, setFormData] = useState({
@@ -24,6 +23,7 @@ export function SubmitExpense() {
   const [ocrProcessing, setOcrProcessing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [extractedFrom, setExtractedFrom] = useState(''); // Tracking vendor for display
+  const [myRequests, setMyRequests] = useState<any[]>([]);
 
   const categories = [
     'Travel',
@@ -60,7 +60,7 @@ export function SubmitExpense() {
         currency: sample.currency,
         date: sample.date,
         category: sample.category,
-        notes: `Extracted from ${sample.vendor} receipt.`,
+        notes: `Extracted from ${sample.vendor} receipt. Single journey from Stalybridge to Manchester Stations.`,
       });
       
       setExtractedFrom(sample.vendor);
@@ -82,16 +82,30 @@ export function SubmitExpense() {
   };
 
   // --- Demo Function ---
-  const handleDemo = () => {
-    setReceiptPreview('https://images.unsplash.com/photo-1534531173927-aeb928d54385?auto=format&fit=crop&q=80&w=600');
+const handleDemo = () => {
+    // This is the direct hotlink to your image file
+    setReceiptPreview('https://i.postimg.cc/8ckDnFSd/train-demo-ticket.png'); 
     runSimulatedOCR();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+  const newRequest = {
+    ...formData,
+    id: Date.now(),
+    status: 'Pending',
+    submittedAt: new Date().toLocaleDateString(),
+  };
+
     setSubmitted(true);
+
+  // After 2 seconds, reset everything and add to the list
     setTimeout(() => {
+      setMyRequests((prev) => [newRequest, ...prev]);
       setSubmitted(false);
+
+    // Reset form
       setFormData({
         amount: '',
         currency: 'GBP',
@@ -105,6 +119,7 @@ export function SubmitExpense() {
       setExtractedFrom('');
     }, 2000);
   };
+
 
   const handleRemoveReceipt = () => {
     setReceipt(null);

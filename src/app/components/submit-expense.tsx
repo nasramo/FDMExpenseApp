@@ -10,7 +10,7 @@ interface SubmitExpenseProps {
   };
 }
 
-export function SubmitExpense() {
+export function SubmitExpense({ user }: SubmitExpenseProps) {
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
 
   // --- OCR Samples (Added as requested) ---
@@ -164,13 +164,15 @@ export function SubmitExpense() {
       setTimeout(() => {
         setSubmitted(false);
         // Reset form
-        setFormData({
+          setFormData({
           amount: '',
+          currency: '',
           category: '',
           date: '',
           project: '',
           notes: '',
         });
+
         setReceipt(null);
         setReceiptPreview('');
       }, 2000);

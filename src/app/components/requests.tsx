@@ -10,7 +10,7 @@ interface RequestsProps {
 
 export function Requests({ user }: RequestsProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState(normalizedStatus);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
 
   const requests = [
@@ -110,8 +110,8 @@ export function Requests({ user }: RequestsProps) {
   };
 
   useEffect(() => {
-    setStatusFilter(normalizedStatus);
-  }, [normalizedStatus]);
+    setStatusFilter('all');
+  }, ['all']);
 
   const filteredRequests = requests.filter((req) => {
     const matchesSearch = req.title.toLowerCase().includes(searchQuery.toLowerCase());

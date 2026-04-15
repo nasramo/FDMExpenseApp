@@ -1,18 +1,29 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Upload, X, Camera, Loader, CheckCircle } from 'lucide-react';
 
 export function SubmitExpense() {
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
+
+  // --- OCR Samples (Added as requested) ---
+  const ocrSamples = [
+    { vendor: 'Trainline', amount: '94.50', currency: 'GBP', date: '2026-04-12', category: 'Travel' },
+    { vendor: 'Premier Inn', amount: '185.00', currency: 'GBP', date: '2026-04-10', category: 'Training & Education' },
+  ];
+
   const [formData, setFormData] = useState({
     amount: '',
+    currency: 'GBP', 
     category: '',
     date: '',
     project: '',
     notes: '',
   });
+
   const [receipt, setReceipt] = useState<File | null>(null);
   const [receiptPreview, setReceiptPreview] = useState<string>('');
   const [ocrProcessing, setOcrProcessing] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [extractedFrom, setExtractedFrom] = useState(''); // Tracking vendor for display
 
   const categories = [
     'Travel',
@@ -33,6 +44,30 @@ export function SubmitExpense() {
     'Client: TechStart Inc',
   ];
 
+  const currencies = ['GBP', 'USD', 'EUR', 'CAD'];
+
+  // --- OCR Logic Function ---
+  const runSimulatedOCR = () => {
+    setOcrProcessing(true);
+    setExtractedFrom('');
+
+    setTimeout(() => {
+      const sample = ocrSamples[Math.floor(Math.random() * ocrSamples.length)];
+      
+      setFormData({
+        ...formData,
+        amount: sample.amount,
+        currency: sample.currency,
+        date: sample.date,
+        category: sample.category,
+        notes: `Extracted from ${sample.vendor} receipt.`,
+      });
+      
+      setExtractedFrom(sample.vendor);
+      setOcrProcessing(false);
+    }, 2000);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -40,20 +75,16 @@ export function SubmitExpense() {
       const reader = new FileReader();
       reader.onloadend = () => {
         setReceiptPreview(reader.result as string);
-        // Simulate OCR processing
-        setOcrProcessing(true);
-        setTimeout(() => {
-          setFormData({
-            ...formData,
-            amount: '124.50',
-            date: '2026-04-14',
-            category: 'Meals & Entertainment',
-          });
-          setOcrProcessing(false);
-        }, 2000);
+        runSimulatedOCR(); // Trigger OCR on file selection
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  // --- Demo Function ---
+  const handleDemo = () => {
+    setReceiptPreview('https://images.unsplash.com/photo-1534531173927-aeb928d54385?auto=format&fit=crop&q=80&w=600');
+    runSimulatedOCR();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -61,9 +92,9 @@ export function SubmitExpense() {
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
-      // Reset form
       setFormData({
         amount: '',
+        currency: 'GBP',
         category: '',
         date: '',
         project: '',
@@ -71,12 +102,14 @@ export function SubmitExpense() {
       });
       setReceipt(null);
       setReceiptPreview('');
+      setExtractedFrom('');
     }, 2000);
   };
 
   const handleRemoveReceipt = () => {
     setReceipt(null);
     setReceiptPreview('');
+    setExtractedFrom('');
   };
 
   if (submitted) {
@@ -101,60 +134,69 @@ export function SubmitExpense() {
 
   return (
     <div className="p-8 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2">Submit Expense</h1>
-        <p className="text-muted-foreground">Upload your receipt and fill in the details</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+          <h1 className="text-4xl font-bold text-foreground mb-2">Submit Expense</h1>
+          <p className="text-muted-foreground">Upload your receipt and fill in the details</p>
+        </div>
+        {/* Demo Button */}
+        <button 
+          type="button"
+          onClick={handleDemo}
+          className="flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-lg text-sm font-semibold hover:bg-amber-200 transition-colors border border-amber-200"
+        >
+          <Upload size={16} />
+          Try Demo Auto-Fill
+        </button>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Receipt Upload */}
         <div className="bg-card border border-border rounded-2xl p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4">Receipt</h3>
 
           {!receiptPreview ? (
-            <div className="border-2 border-dashed border-border rounded-xl p-12 text-center hover:border-primary transition-colors cursor-pointer group">
-              <label htmlFor="receipt-upload" className="cursor-pointer">
-                <Upload size={48} className="mx-auto text-muted-foreground group-hover:text-primary transition-colors mb-4" />
-                <p className="text-foreground font-medium mb-2">
-                  Drop your receipt here, or <span className="text-primary">browse</span>
-                </p>
-                <p className="text-sm text-muted-foreground mb-4">Supports JPG, PNG, PDF up to 10MB</p>
-                <div className="flex items-center justify-center gap-4">
-                  <span className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity inline-block">
-                    Upload File
-                  </span>
-                  <button
-                    type="button"
-                    className="px-4 py-2 border border-border rounded-lg font-medium hover:bg-secondary transition-colors flex items-center gap-2"
-                  >
-                    <Camera size={18} />
-                    Take Photo
-                  </button>
-                </div>
-                <input
-                  id="receipt-upload"
-                  type="file"
-                  accept="image/*,.pdf"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-            </div>
-          ) : (
-            <div className="relative">
-              <div className="relative rounded-xl overflow-hidden border border-border">
-                <img src={receiptPreview} alt="Receipt" className="w-full max-h-96 object-contain bg-muted" />
+            <div className="border-2 border-dashed border-border rounded-xl p-12 text-center hover:border-primary transition-colors cursor-pointer group relative">
+              <Upload size={48} className="mx-auto text-muted-foreground group-hover:text-primary transition-colors mb-4" />
+              <p className="text-foreground font-medium mb-2">
+                Drop your receipt here, or <span className="text-primary">browse</span>
+              </p>
+              <p className="text-sm text-muted-foreground mb-4">Supports JPG, PNG, PDF up to 10MB</p>
+              <div className="flex items-center justify-center gap-4">
+                <label
+                  htmlFor="receipt-upload"
+                  className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity inline-block cursor-pointer"
+                >
+                  Upload File
+                </label>
                 <button
                   type="button"
-                  onClick={handleRemoveReceipt}
-                  className="absolute top-3 right-3 p-2 bg-destructive text-destructive-foreground rounded-lg hover:opacity-90 transition-opacity"
+                  onClick={() => cameraInputRef.current?.click()}
+                  className="px-4 py-2 border border-border rounded-lg font-medium hover:bg-secondary transition-colors flex items-center gap-2"
                 >
-                  <X size={18} />
+                  <Camera size={18} />
+                  Take Photo
                 </button>
               </div>
+              <input id="receipt-upload" type="file" accept="image/*,.pdf" onChange={handleFileUpload} className="hidden" />
+              <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleFileUpload} className="hidden" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="relative">
+                <div className="relative rounded-xl overflow-hidden border border-border bg-muted">
+                  <img src={receiptPreview} alt="Receipt" className="w-full max-h-96 object-contain" />
+                  <button
+                    type="button"
+                    onClick={handleRemoveReceipt}
+                    className="absolute top-3 right-3 p-2 bg-destructive text-destructive-foreground rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+              </div>
+              
               {ocrProcessing && (
-                <div className="mt-4 flex items-center gap-3 p-4 bg-primary/10 border border-primary/20 rounded-xl">
+                <div className="flex items-center gap-3 p-4 bg-primary/10 border border-primary/20 rounded-xl">
                   <Loader size={20} className="animate-spin text-primary" />
                   <div>
                     <p className="font-medium text-foreground">Processing Receipt...</p>
@@ -162,31 +204,48 @@ export function SubmitExpense() {
                   </div>
                 </div>
               )}
+
+              {extractedFrom && !ocrProcessing && (
+                <div className="flex items-center gap-3 p-4 bg-success/10 border border-success/20 rounded-xl animate-in fade-in slide-in-from-top-1">
+                  <CheckCircle size={20} className="text-success" />
+                  <div>
+                    <p className="font-medium text-foreground">OCR Complete</p>
+                    <p className="text-sm text-muted-foreground">Data extracted from <strong>{extractedFrom}</strong></p>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
 
-        {/* Expense Details */}
         <div className="bg-card border border-border rounded-2xl p-6 space-y-6">
           <h3 className="text-lg font-semibold text-foreground">Expense Details</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label htmlFor="amount" className="block text-sm mb-2 text-foreground">
-                Amount *
+            <div className="space-y-2">
+              <label htmlFor="amount" className="block text-sm text-foreground">
+                Amount & Currency *
               </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                <input
-                  id="amount"
-                  type="number"
-                  step="0.01"
-                  value={formData.amount}
-                  onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full pl-8 pr-4 py-3 rounded-xl border border-border bg-input-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                  placeholder="0.00"
-                  required
-                />
+              <div className="flex gap-2">
+                <select
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  className="w-24 px-3 py-3 rounded-xl border border-border bg-input-background focus:ring-2 focus:ring-primary outline-none transition-all"
+                >
+                  {currencies.map(curr => <option key={curr} value={curr}>{curr}</option>)}
+                </select>
+                <div className="relative flex-1">
+                  <input
+                    id="amount"
+                    type="number"
+                    step="0.01"
+                    value={formData.amount}
+                    onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl border border-border bg-input-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
@@ -217,9 +276,7 @@ export function SubmitExpense() {
               >
                 <option value="">Select category</option>
                 {categories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
+                  <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
             </div>
@@ -237,9 +294,7 @@ export function SubmitExpense() {
               >
                 <option value="">Select project</option>
                 {projects.map((proj) => (
-                  <option key={proj} value={proj}>
-                    {proj}
-                  </option>
+                  <option key={proj} value={proj}>{proj}</option>
                 ))}
               </select>
             </div>
@@ -260,7 +315,6 @@ export function SubmitExpense() {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-end gap-4">
           <button
             type="button"

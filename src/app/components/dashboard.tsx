@@ -1,12 +1,53 @@
 import React from 'react';
 import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, DollarSign, PlusCircle, Upload } from 'lucide-react';
 import { Link } from 'react-router';
-
+import { useEffect, useState } from "react";
+import { supabase } from '../../supabaseClient';
 interface DashboardProps {
   userRole?: 'employee' | 'manager' | 'admin';
 }
 
 export function Dashboard({ userRole = 'employee' }: DashboardProps) {
+  const [recentActivity, setRecentActivity] = useState<any[]>([]);
+  useEffect(() => {
+  loadRecent();
+}, []);
+
+async function loadRecent() {
+  const { data, error } = await supabase
+    .from("expenses")
+    .select("*")
+    .order("date", { ascending: false })
+    .limit(5);
+
+  if (error) {
+    console.error("Error loading recent activity:", error);
+    return;
+  }
+
+  const mapped = data.map((exp) => ({
+    id: exp.id,
+    type: exp.status,
+    title: `${exp.category} - ${exp.project}`,
+    amount: `£${exp.amount.toFixed(2)}`,
+    date: formatRelativeTime(exp.date),
+    status: exp.status
+  }));
+
+  setRecentActivity(mapped);
+}
+function formatRelativeTime(dateString: string) {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+  if (diffHours < 1) return "Just now";
+  if (diffHours < 24) return `${diffHours} hours ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} days ago`;
+}
   const stats = [
     {
       label: 'Total Expenses',
@@ -42,48 +83,6 @@ export function Dashboard({ userRole = 'employee' }: DashboardProps) {
     },
   ];
 
-  const recentActivity = [
-    {
-      id: 1,
-      type: 'Approved',
-      title: 'Client Lunch - Acme Corp',
-      amount: '$124.50',
-      date: '2 hours ago',
-      status: 'Approved'
-    },
-    {
-      id: 2,
-      type: 'Pending',
-      title: 'Travel - London Office',
-      amount: '$850.00',
-      date: '5 hours ago',
-      status: 'Pending'
-    },
-    {
-      id: 3,
-      type: 'Approved',
-      title: 'Office Supplies',
-      amount: '$42.99',
-      date: '1 day ago',
-      status: 'Approved'
-    },
-    {
-      id: 4,
-      type: 'Rejected',
-      title: 'Team Dinner',
-      amount: '$280.00',
-      date: '2 days ago',
-      status: 'Rejected'
-    },
-    {
-      id: 5,
-      type: 'Approved',
-      title: 'Software Subscription',
-      amount: '$99.00',
-      date: '3 days ago',
-      status: 'Approved'
-    },
-  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {

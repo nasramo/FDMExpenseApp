@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import fdmLightLogo from '../assets/fdm-light.svg';
+import fdmDarkLogo from '../assets/fdm-dark.svg';
+import fdmTrackpointLightLogo from '../assets/fdm-trackpoint-light.svg';
 
 interface LoginProps {
   onLogin: (role: 'employee' | 'manager') => void;
@@ -11,6 +14,17 @@ export function Login({ onLogin }: LoginProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
+  const [isDark, setIsDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  );
+
+  useEffect(() => {
+    const setTheme = () => setIsDark(document.documentElement.classList.contains('dark'));
+    setTheme();
+    const observer = new MutationObserver(setTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,11 +57,19 @@ export function Login({ onLogin }: LoginProps) {
           {/* Logo */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-cyan-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="font-bold text-white text-lg">FDM</span>
+              <div className="w-12 h-12 bg-gradient-to-br from-primary via-primary/80 to-primary/40 rounded-xl flex items-center justify-center shadow-lg">
+                <img
+                  src={isDark ? fdmDarkLogo : fdmLightLogo}
+                  alt="FDM logo"
+                  className="w-8 h-8 object-contain"
+                />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">FDM Group</h1>
+              <div className="flex flex-col justify-center">
+                <img
+                  src={fdmTrackpointLightLogo}
+                  alt="FDM Trackpoint logo"
+                  className="h-8 w-auto"
+                />
                 <p className="text-sm text-muted-foreground">Expenses Management</p>
               </div>
             </div>

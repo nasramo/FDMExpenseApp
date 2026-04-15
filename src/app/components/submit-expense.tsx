@@ -2,7 +2,15 @@ import { useState } from 'react';
 import { Upload, X, Camera, Loader, CheckCircle } from 'lucide-react';
 import { supabase } from '../../supabaseClient';
 
-export function SubmitExpense() {
+interface SubmitExpenseProps {
+  user: {
+    id: string;
+    username: string;
+    role: 'employee' | 'manager' | 'admin';
+  };
+}
+
+export function SubmitExpense({ user }: SubmitExpenseProps) {
   const [formData, setFormData] = useState({
     amount: '',
     category: '',

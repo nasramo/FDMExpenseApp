@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { User, Bell, Shield, Globe, Palette, Save } from 'lucide-react';
+interface SettingsProps {
+  user: {
+    id: string;
+    username: string;
+    role: 'employee' | 'manager' | 'admin';
+  };
+}
 
-export function Settings() {
+export function Settings({ user }: SettingsProps) {
   const [activeTab, setActiveTab] = useState('profile');
   const [isDark, setIsDark] = useState(false);
   const [notifications, setNotifications] = useState({

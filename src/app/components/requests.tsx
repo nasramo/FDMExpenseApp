@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { Search, Filter, Eye, MessageSquare, Calendar, DollarSign } from 'lucide-react';
+interface RequestsProps {
+  user: {
+    id: string;
+    username: string;
+    role: 'employee' | 'manager' | 'admin';
+  };
+}
 
-export function Requests() {
+export function Requests({ user }: RequestsProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState<number | null>(null);

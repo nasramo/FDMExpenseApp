@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Filter, Eye, MessageSquare, Calendar, DollarSign } from 'lucide-react';
 interface RequestsProps {
   user: {
@@ -10,7 +10,7 @@ interface RequestsProps {
 
 export function Requests({ user }: RequestsProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState(normalizedStatus);
   const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
 
   const requests = [
@@ -108,6 +108,10 @@ export function Requests({ user }: RequestsProps) {
         return 'bg-muted text-muted-foreground border-border';
     }
   };
+
+  useEffect(() => {
+    setStatusFilter(normalizedStatus);
+  }, [normalizedStatus]);
 
   const filteredRequests = requests.filter((req) => {
     const matchesSearch = req.title.toLowerCase().includes(searchQuery.toLowerCase());

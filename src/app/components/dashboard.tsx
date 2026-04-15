@@ -133,6 +133,12 @@ const statsArray = [
     }
   };
 
+  const statusRouteMap: Record<string, string> = {
+    Pending: '/requests?status=Pending',
+    Approved: '/requests?status=Approved',
+    Rejected: '/requests?status=Rejected',
+  };
+
   return (
     <div className="p-8 max-w-7xl mx-auto">
       {/* Header */}
@@ -178,11 +184,10 @@ const statsArray = [
           const Icon = stat.icon;
           const trendIcon = stat.trend === 'up' ? TrendingUp : stat.trend === 'down' ? TrendingDown : null;
 
-          return (
-            <div
-              key={stat.label}
-              className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-shadow"
-            >
+          const statusRoute = statusRouteMap[stat.label];
+
+          const cardContent = (
+            <>
               <div className="flex items-start justify-between mb-4">
                 <div className={`w-12 h-12 rounded-xl bg-${stat.color}/10 flex items-center justify-center`}>
                   <Icon size={24} className={`text-${stat.color}`} />
@@ -198,6 +203,22 @@ const statsArray = [
                 <p className="text-3xl font-bold text-foreground mb-1">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.change}</p>
               </div>
+            </>
+          );
+          return statusRoute ? (
+            <Link
+              key={stat.label}
+              to={statusRoute}
+              className="bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-shadow block"
+            >
+              {cardContent}
+            </Link>
+          ) : (
+            <div
+              key={stat.label}
+              className= "bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-shadow"
+            >
+              {cardContent}
             </div>
           );
         })}

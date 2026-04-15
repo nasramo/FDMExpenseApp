@@ -1,16 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Search, Filter, Eye, MessageSquare, Calendar, DollarSign } from 'lucide-react';
-import { useSearchParams } from 'react-router';
 
 export function Requests() {
-  const [searchParams] = useSearchParams();
-  const statusFromQuery = searchParams.get('status') ?? 'all';
-  const normalizedStatus = ['Pending', 'Approved', 'Rejected', 'all'].includes(statusFromQuery)
-    ? statusFromQuery
-    : 'all';
-
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState(normalizedStatus);
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
 
   const requests = [
@@ -108,10 +101,6 @@ export function Requests() {
         return 'bg-muted text-muted-foreground border-border';
     }
   };
-
-  useEffect(() => {
-    setStatusFilter(normalizedStatus);
-  }, [normalizedStatus]);
 
   const filteredRequests = requests.filter((req) => {
     const matchesSearch = req.title.toLowerCase().includes(searchQuery.toLowerCase());

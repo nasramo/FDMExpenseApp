@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../../supabaseClient';
 
 interface LoginProps {
   onLogin: (role: 'employee' | 'manager') => void;
@@ -11,12 +12,33 @@ export function Login({ onLogin }: LoginProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Mock login - check if manager email
-    const role = email.includes('manager') ? 'manager' : 'employee';
-    onLogin(role);
-  };
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  // Query Supabase for the user
+  const { data, error } = await supabase
+    .from('Users')
+    .select('*')
+    .eq('username', email)
+    .single();
+
+  if (error || !data) {
+    alert('Invalid email or password');
+    return;
+  }
+
+  // Check password (plain text for prototype)
+  if (data.password !== password) {
+    alert('Invalid email or password');
+    return;
+  }
+
+  // Extract role from DB
+  const role = data.usertype as 'employee' | 'manager';
+
+  // Pass role to parent
+  onLogin(role);
+};
 
   return (
     <div className="min-h-screen flex">
@@ -141,7 +163,7 @@ export function Login({ onLogin }: LoginProps) {
             </form>
 
             <p className="text-xs text-center text-muted-foreground mt-8">
-              Demo: Use "employee@fdm.com" or "manager@fdm.com" with any password
+              Demo: Use "employee@fdm.com" or "manager@fdm.com" with password "employee123" or "manager123" respectively.
             </p>
           </div>
         </div>

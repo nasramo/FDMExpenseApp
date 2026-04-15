@@ -3,7 +3,11 @@ import { Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../../supabaseClient';
 
 interface LoginProps {
-  onLogin: (role: 'employee' | 'manager') => void;
+  onLogin: (user: {
+    id: string;
+    username: string;
+    role: 'employee' | 'manager' | 'admin';
+  }) => void;
 }
 
 export function Login({ onLogin }: LoginProps) {
@@ -37,7 +41,11 @@ export function Login({ onLogin }: LoginProps) {
   const role = data.usertype as 'employee' | 'manager';
 
   // Pass role to parent
-  onLogin(role);
+  onLogin({
+  id: data.user_ID,
+  username: data.username,
+  role: data.usertype
+});
 };
 
   return (

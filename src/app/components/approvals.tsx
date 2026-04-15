@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { Search, Filter, Eye, CheckCircle, XCircle, Clock, User } from 'lucide-react';
+interface ApprovalsProps {
+  user: {
+    id: string;
+    username: string;
+    role: 'employee' | 'manager' | 'admin';
+  };
+}
 
-export function Approvals() {
+export function Approvals({ user }: ApprovalsProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRequest, setSelectedRequest] = useState<number | null>(null);
   const [comment, setComment] = useState('');

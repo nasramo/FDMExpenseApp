@@ -4,10 +4,14 @@ import { Link } from 'react-router';
 import { useEffect, useState } from "react";
 import { supabase } from '../../supabaseClient';
 interface DashboardProps {
-  userRole?: 'employee' | 'manager' | 'admin';
+  user: {
+    id: string;
+    username: string;
+    role: 'employee' | 'manager' | 'admin';
+  };
 }
 
-export function Dashboard({ userRole = 'employee' }: DashboardProps) {
+export function Dashboard({ user }: DashboardProps) {
   const [stats, setStats] = useState({
   total: 0,
   pending: 0,
@@ -21,8 +25,9 @@ useEffect(() => {
 
 async function loadStats() {
   const { data, error } = await supabase
-    .from("expenses")
-    .select("amount, status");
+  .from("expenses")
+  .select("amount, status")
+  .eq("user", user.id);
 
   if (error) {
     console.error("Error loading stats:", error);
@@ -41,13 +46,15 @@ async function loadStats() {
   useEffect(() => {
   loadRecent();
 }, []);
-
+console.log("hello from 1");
 async function loadRecent() {
   const { data, error } = await supabase
     .from("expenses")
     .select("*")
+    .eq("user", user.id)
     .order("date", { ascending: false })
     .limit(5);
+    console.log("hello from 2");
 
   if (error) {
     console.error("Error loading recent activity:", error);
@@ -130,14 +137,15 @@ const statsArray = [
     <div className="p-8 max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-foreground mb-2">
-          {userRole === 'manager' ? 'Team Overview' : 'Dashboard'}
-        </h1>
-        <p className="text-muted-foreground">
-          {userRole === 'manager'
-            ? 'Manage your team\'s expense requests and approvals'
-            : 'Track your expenses and manage your requests'}
-        </p>
+      <h1 className="text-4xl font-bold text-foreground mb-2">
+        {user.role === 'manager' ? 'Team Overview' : 'Dashboard'}
+      </h1>
+
+      <p className="text-muted-foreground">
+        {user.role === 'manager'
+          ? "Manage your team's expense requests and approvals"
+          : 'Track your expenses and manage your requests'}
+      </p>
       </div>
 
       {/* Quick Actions */}

@@ -13,6 +13,7 @@ import {
   Moon
 } from 'lucide-react';
 
+
 interface LayoutProps {
   children: React.ReactNode;
   userRole?: 'employee' | 'manager' | 'admin';

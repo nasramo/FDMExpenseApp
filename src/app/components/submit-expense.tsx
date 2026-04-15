@@ -105,6 +105,7 @@ export function SubmitExpense({ user }: SubmitExpenseProps) {
             notes: formData.notes,
             receipt_url: receiptUrl,
             status: 'pending',
+            user: user.id
           },
         ])
         .select();

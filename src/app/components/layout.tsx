@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router';
 import {
   LayoutDashboard,
@@ -12,6 +12,10 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
+import fdmLightLogo from '../assets/fdm-light.svg';
+import fdmDarkLogo from '../assets/fdm-dark.svg';
+import fdmTrackpointLightLogo from '../assets/fdm-trackpoint-light.svg';
+import fdmTrackpointDarkLogo from '../assets/fdm-trackpoint-dark.svg';
 
 
 interface LayoutProps {
@@ -23,8 +27,18 @@ interface LayoutProps {
 export function Layout({ children, userRole = 'employee', onLogout }: LayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() =>
+    typeof document !== 'undefined' && document.documentElement.classList.contains('dark')
+  );
   const location = useLocation();
+
+  useEffect(() => {
+    const setTheme = () => setIsDark(document.documentElement.classList.contains('dark'));
+    setTheme();
+    const observer = new MutationObserver(setTheme);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
 
   const toggleTheme = () => {
     setIsDark(!isDark);
@@ -55,7 +69,7 @@ export function Layout({ children, userRole = 'employee', onLogout }: LayoutProp
       {/* Mobile Menu Button */}
       <button
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-primary-foreground rounded-lg shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-primary text-primary-foreground rounded-lg shadow-lg inline-flex items-center justify-center"
       >
         {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
       </button>
@@ -70,17 +84,18 @@ export function Layout({ children, userRole = 'employee', onLogout }: LayoutProp
       >
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-sidebar-border">
-          {!sidebarCollapsed && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-cyan-600 rounded-lg flex items-center justify-center">
-                <span className="font-bold text-white text-sm">FDM</span>
-              </div>
-              <span className="font-semibold text-sidebar-foreground">Expenses</span>
+          <div className={`${sidebarCollapsed ? 'hidden' : 'flex-1'}`}>
+            <div className="w-full h-8 bg-gradient-to-br from-primary via-primary/80 to-primary/40 rounded-lg flex items-center justify-center">
+              <img
+                src={isDark ? fdmTrackpointDarkLogo : fdmTrackpointLightLogo}
+                alt="FDM Trackpoint logo"
+                className="h-full w-auto object-contain px-2"
+              />
             </div>
-          )}
+          </div>
           <button
             onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-            className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors"
+            className="p-2 hover:bg-sidebar-accent rounded-lg transition-colors inline-flex items-center justify-center"
           >
             {sidebarCollapsed ? <Menu size={20} /> : <X size={20} />}
           </button>
@@ -98,7 +113,9 @@ export function Layout({ children, userRole = 'employee', onLogout }: LayoutProp
                 to={item.path}
                 onClick={() => setMobileMenuOpen(false)}
                 className={`
-                  flex items-center gap-3 px-3 py-3 rounded-lg transition-all
+                  flex items-center gap-3 py-3 rounded-lg transition-all ${
+                    sidebarCollapsed ? 'justify-center px-0' : 'px-3'
+                  }
                   ${isActive
                     ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm'
                     : 'text-sidebar-foreground hover:bg-sidebar-accent'
@@ -116,7 +133,9 @@ export function Layout({ children, userRole = 'employee', onLogout }: LayoutProp
         <div className="p-3 border-t border-sidebar-border space-y-2">
           <button
             onClick={toggleTheme}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+            className={`w-full flex items-center gap-3 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors ${
+              sidebarCollapsed ? 'justify-center px-0' : 'px-3'
+            }`}
           >
             {isDark ? <Sun size={20} /> : <Moon size={20} />}
             {!sidebarCollapsed && <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>}
@@ -124,7 +143,9 @@ export function Layout({ children, userRole = 'employee', onLogout }: LayoutProp
 
           <button
             onClick={onLogout}
-            className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors"
+            className={`w-full flex items-center gap-3 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent transition-colors ${
+              sidebarCollapsed ? 'justify-center px-0' : 'px-3'
+            }`}
           >
             <LogOut size={20} />
             {!sidebarCollapsed && <span>Logout</span>}

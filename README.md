@@ -1,11 +1,9 @@
 
-  # Expenses Management App UI
+  # Group 44 FDM Expense App
+  FDM Expense App is a lightweight application for managing and tracking expenses within the organisation. It provides a structured way for FDM employees to record expenses and for teams to have a way to view spending.
 
-  This is a code bundle for Expenses Management App UI. The original project is available at https://www.figma.com/design/tqSJGlqN5TfFq0PkEFBmQR/Expenses-Management-App-UI.
-
-  ## Running the code
+  ## Install dependencies/run the code
 
   Run `npm i` to install the dependencies.
 
   Run `npm run dev` to start the development server.
-  
